@@ -7,10 +7,13 @@ exports.up = function(knex) {
         .unique()
         .notNullable();
       tbl.string('password', 128)
+        .notNullable();
+      tbl.string ('role', 28);
   })
   
 };
 
 exports.down = function(knex) {
-  
+    return knex.schema
+        .dropTableIfExists('users');
 };
