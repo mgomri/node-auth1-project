@@ -20,7 +20,7 @@ router.post('/register', (req, res) => {
 
 });
 
-router.get('/users', (req, res) => {
+router.get('/users', restricted, (req, res) => {
     Users.find()
         .then(user => {
             res.status(200).json(user);
@@ -38,7 +38,7 @@ router.post('/login', (req, res) =>{
         .then(user => {
             if(user && bcrypt.compareSync(password, user.password)){
                 req.session.user = user;
-                res.status(200).json({ messgae:`welcome ${user.username}`});
+                res.status(200).json({ message:`welcome ${user.username}`});
             }else {
                 res.status(401).json({ message: 'Invalid Credentials'});
             }
@@ -48,5 +48,25 @@ router.post('/login', (req, res) =>{
         });
 });
 
+router.get('/logout', (req, res) => {
+    if(req.session){
+        req.session.destroy(err => {
+            if(err){
+                res.json({message: 'you gonna stay logged in forever muhahaha'});
+            }else{
+                res.status(200).json({ message: 'goodbye my friend'})
+            }
+        })
+    }else{
+        res.status(200).json({ message: 'you were never here'});
+    }
+})
 
+function restricted(req, res, next) {
+    if (req.session && req.session.user) {
+      next();
+    } else {
+      res.status(401).json({ you: "cannot pass!" });
+    }
+  }
 module.exports = router;
